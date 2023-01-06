@@ -115,7 +115,7 @@ n_cores<- detectCores() - 3
 # Create a cluster of cores running R to run in parallel 
 cl<- makeCluster(n_cores)
 
-# Split files indexes into a set of n lists where n is n_cores. Each core will read the files in its given range.
+# Split file indexes into lists of 20 file indexes each. Each core will be passed these file ranges to read in turn.
 file_ranges<- split(1:length(files), ceiling(seq_along(1:length(files))/20))
 
 # Export the relevant R objects to the cluster
@@ -126,3 +126,31 @@ results<- parLapply(cl, file_ranges, read_tweet_json)
 
 # Stop the cluster of cores
 stopCluster(cl)
+
+# Save result of parLapply (as a backup)
+save(results, file = "parLapply_results_tweet_data_extraction.Rda")
+
+# Check if any of the results are NULL
+any(is.null(results))
+
+# Bind all the dataframes returned by parLapply into one dataframe
+tweet_df<- do.call("rbind", results)
+
+
+### STEP 3: SAVE DATA IN UNIVERISTY OF NOTTINGHAM ONEDRIVE ###
+
+# Get data folder on University of Nottingham OneDrive
+data_dir<- choose.dir(caption = "Select data directory on University of Nottingham OneDrive under Twitter Scrapes > Datasets")
+
+# Save as Rda file
+save(tweet_df, file = paste0(data_dir, "\\Tweet Data\\Rda Formatted Data\\Tweet Data.Rda"))
+
+# Split tweet_df into smaller dataframes of max 500,000 rows each and save as series of CSV files
+row_ranges<- split(1:nrow(tweet_df), ceiling(seq_along(1:nrow(tweet_df))/500000))
+
+lapply(row_ranges, function(row_range){
+  
+  out_df<- tweet_df[row_range,]
+  write.csv(out_df, file = paste0(data_dir, "\\..\\Tweet Data\\CSV Formatted Data\\Tweet Data Rows ", min(row_range), " - ", max(row_range), ".csv"), row.names = F, fileEncoding = "UTF-8")
+  
+})
