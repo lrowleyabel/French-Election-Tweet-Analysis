@@ -6,7 +6,7 @@ There is no actual data in this repository. The code creates and analyses datase
 
 **Workflow:**
 - **Data preparation:**
-   - Create dataset of Tweets (getting_tweet_data_from_raw_json_files.R)
-   - Create dataset of Twitter accounts (getting_account_data_from_raw_json_files.R)
+   - Create dataset of Tweets: _getting_tweet_data_from_raw_json_files.R_
+   - Create dataset of Twitter accounts: _getting_account_data_from_raw_json_files.R_
    - Create dataset of Tweet metrics for each BIOID
 - **Analysis**
