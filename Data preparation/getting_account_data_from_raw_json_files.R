@@ -6,7 +6,7 @@
 
 
 # LAURENCE ROWLEY-ABEL, UNIVERSITY OF EDINBURGH
-# UPDATED: 06/01/23
+# UPDATED: 07/01/23
 
 # DESCRIPTION: This file takes the raw JSON files which contain all the scraped tweets (provided by Digital Society Project) and extracts
 # a set of variables about each Twitter account. It then combines them together and saves the data in a Rda and CSV file.
@@ -21,10 +21,6 @@ library(utils)
 
 setwd(choose.dir(caption = "Select working directory"))
 rm(list = ls())
-
-
-### STEP 1: SET UP FUNCTION TO READ JSON FILES ###
-
 
 # Get path to raw JSON files on Univeristy of Nottingham OneDrive
 dir<- choose.dir(caption = "Select directory containing Twitter scrapes")
@@ -58,6 +54,10 @@ for (file in files){
 # Remove nested list variables
 accounts_df<- accounts_df%>%
   select(-c(withheld_in_countries, entities.description.urls, entities.url.urls))
+
+
+# Get list of empty directories within the scraped data folder. These are twitter accounts who had no tweets
+
 
 # Get data folder on University of Nottingham OneDrive
 data_dir<- choose.dir(caption = "Select data directory on University of Nottingham OneDrive under Twitter Scrapes > Datasets")

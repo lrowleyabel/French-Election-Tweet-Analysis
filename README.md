@@ -8,5 +8,7 @@ There is no actual data in this repository. The code creates and analyses datase
 - **Data preparation:**
    - Create dataset of Tweets: _getting_tweet_data_from_raw_json_files.R_
    - Create dataset of Twitter accounts: _getting_account_data_from_raw_json_files.R_
-   - Create dataset of Tweet metrics for each BIOID
-- **Analysis**
+   - Create lookup joining BIOIDs to Twitter Handles: _creating_BIOID_to_twitter_handle_lookup.R_
+   - Create dataset of Tweet metrics for each BIOIDs: _calculating_metrics.R_
+- **Analysis:**
+   - TBD
