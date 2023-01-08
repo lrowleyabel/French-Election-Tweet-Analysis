@@ -196,6 +196,48 @@ ggplot(metrics_df)+
 metrics_df<- metrics_df%>%
   mutate(across(c(total_followers, total_following, total_tweets, total_campaign_tweets, total_pre_campaign_tweets, mean_likes, mean_times_retweeted_by_others), ~log(.x+1), .names = "log_{.col}"))
 
+# Create composite 'dynamism' score to summarise overall Twitter activity
+# Select variables to include in composite score
+score_df<- metrics_df%>%
+  select(BIOID, log_total_campaign_tweets, log_total_pre_campaign_tweets, log_total_followers, log_total_following, log_mean_likes, log_mean_times_retweeted_by_others)
+
+# Rescale variables to between 0 and 1
+rerange01 <- function(x){(x-min(x))/(max(x)-min(x))}
+
+score_df<- score_df%>%
+  mutate(across(where(is.numeric), ~rerange01(.x)))
+
+# Check rescaling
+score_df%>%
+  summarise(across(where(is.numeric),
+                   .fns = list(Min = ~min(.x, na.rm=T),
+                               Max = ~max(.x, na.rm=T),
+                               Mean = ~mean(.x, na.rm =T),
+                               SD = ~sd(.x, na.rm=T)),
+                   .names = "{.col}__{.fn}"))%>%
+  pivot_longer(cols = everything(), names_to = c("Variable", ".value"), names_sep = "__")%>%
+  mutate(Variable = str_replace_all(Variable, "_", " "))%>%
+  mutate(across(c(Min, Max, Mean, SD), ~round(.x, 2)))
+
+
+# Look at Cronbach's alpha for score variables
+score_df%>%
+  select(-BIOID)%>%
+  psych::alpha()
+
+# Create composite score using row means
+score_df<-score_df%>%
+  rowwise()%>%
+  mutate(dynamism = mean(log_total_campaign_tweets:log_mean_times_retweeted_by_others))
+
+# Look at composite score distribution
+score_df%>%
+  ggplot()+
+  geom_histogram(aes(x = dynamism), color = "white")
+
+# Add composite score to main df
+metrics_df<- left_join(metrics_df, select(score_df, BIOID, dynamism))
+
 # Save metrics data as Rda and CSV file
 save(metrics_df, file = paste0(data_dir, "\\Overall Metrics\\Overall Twitter Metrics.Rda"))
 write.csv(metrics_df, file = paste0(data_dir, "\\Overall Metrics\\Overall Twitter Metrics.csv"), row.names = F, fileEncoding = "UTF-8")
