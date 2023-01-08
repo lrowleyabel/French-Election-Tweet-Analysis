@@ -11,6 +11,7 @@ There is no actual data in this repository. The code creates and analyses datase
    - Create lookup joining BIOIDs to Twitter Handles: _creating_BIOID_to_twitter_handle_lookup.R_
    - Create dataset of Twitter metrics for each BIOIDs: _calculating_metrics.R_
    - Extract hashtags used in Tweets: _extracting_hashtags.R_
-   - Creating TF-IDF metric for each candidate's hashtags: _calculating_hashtag_tfidf.R_
+   - Create TF-IDF metric for each candidate's hashtags: _calculating_hashtag_tfidf.R_
+   - Merge Twitter metrics and demographic/political data on candidates: _merging_metrics_and_candidate_variables.R_
 - **Analysis:**
    - TBD
