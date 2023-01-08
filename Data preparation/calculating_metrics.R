@@ -6,7 +6,7 @@
 
 
 # LAURENCE ROWLEY-ABEL, UNIVERSITY OF EDINBURGH
-# UPDATED: 07/01/23
+# UPDATED: 08/01/23
 
 # DESCRIPTION: This file takes the Tweet data and account data, links it to the relevant BIOIDs and creates a set of metrics
 # summarising the candidate's Twitter activity across all their accounts.
@@ -132,6 +132,10 @@ tweet_metrics<- tweet_df%>%
 
 # Save tweet metrics as CSV file
 write.csv(tweet_metrics, file = paste0(data_dir, "\\Tweet Data\\CSV Formatted Data\\Tweet Metrics.csv"), row.names = F, fileEncoding = "UTF-8")
+
+
+### STEP 3: CREATE METRICS ON OVERALL ACTIVITY ###
+
 
 # Check there are the same BIOIDs in the account metrics and tweet metrics datafranes 
 n_distinct(account_metrics$BIOID)
