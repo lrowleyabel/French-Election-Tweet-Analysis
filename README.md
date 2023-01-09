@@ -17,4 +17,7 @@ None of the main Twitter data is in this repository. The code creates and analys
    - Conduct basic exploratory analysis: _exploratory_analysis.R_
 
 
-![Example Plot](https://raw.githubusercontent.com/lrowleyabel/French-Election-Tweet-Analysis/main/Analysis/Exploratory%20Analysis/Plots/dynamism_by_party_list.png)
+**Example of analysis output:**
+
+
+![Example Plot](https://raw.githubusercontent.com/lrowleyabel/French-Election-Tweet-Analysis/main/Analysis/Exploratory%20Analysis/Plots/mean_tfidf_by_party_list.png)
