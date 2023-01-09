@@ -17,4 +17,4 @@ None of the main Twitter data is in this repository. The code creates and analys
    - Conduct basic exploratory analysis: _exploratory_analysis.R_
 
 
-![]("Analysis/Exploratory Analysis/Plots/mean_tfidf_by_party_list.png")
+![Example Plot](Analysis/Exploratory Analysis/Plots/mean_tfidf_by_party_list.png)
