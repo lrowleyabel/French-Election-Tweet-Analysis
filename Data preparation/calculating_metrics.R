@@ -205,6 +205,10 @@ metrics_df<- metrics_df%>%
 score_df<- metrics_df%>%
   select(BIOID, log_total_campaign_tweets, log_total_pre_campaign_tweets, log_total_followers, log_total_following, log_mean_likes, log_mean_times_retweeted_by_others)
 
+# Conver BIOID to string variable so it doesn't get picked up as a numeric variable to include in the composite score
+score_df<- score_df%>%
+  mutate(BIOID = as.character(BIOID))
+
 # Rescale variables to between 0 and 1
 rerange01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
@@ -238,6 +242,10 @@ score_df<-score_df%>%
 score_df%>%
   ggplot()+
   geom_histogram(aes(x = dynamism), color = "white")
+
+# Convert BIOID back to numeric
+score_df<- score_df%>%
+  mutate(BIOID = as.numeric(BIOID))
 
 # Add composite score to main df
 metrics_df<- left_join(metrics_df, select(score_df, BIOID, dynamism))

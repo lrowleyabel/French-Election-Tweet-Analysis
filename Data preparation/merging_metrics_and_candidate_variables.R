@@ -28,7 +28,7 @@ candidate_df<- read_excel(paste0(candidate_dir, "/Substantive Data Combined Cand
 dataset_dir<- choose.dir("Select directory containing metrics data on University of Nottingham OneDrive, under Twitter Scrapes > Datasets")
 
 # Read in the Tweet Metrics data
-load(paste0(dataset_dir, "\\Overall Metric\\Overall Twitter Metrics.Rda"))
+load(paste0(dataset_dir, "\\Overall Metrics\\Overall Twitter Metrics.Rda"))
 
 # Check all BIOIDs in the metrics data are in the candidate data
 table(metrics_df$BIOID %in% candidate_df$BIOID)

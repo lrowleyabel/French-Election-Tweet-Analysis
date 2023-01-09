@@ -2,7 +2,7 @@
 
 This is code for a research project looking at the Twitter data of candidates in the 2022 French legislative elections. The research is being carried out with the University of Nottingham and [the Digital Society Project](http://digitalsocietyproject.org/).
 
-There is no actual data in this repository. The code creates and analyses datasets, but they are stored on the University of Nottingham OneDrive.
+None of the main Twitter data is in this repository. The code creates and analyses datasets, but they are stored on the University of Nottingham OneDrive.
 
 **Workflow:**
 - **Data preparation:**
@@ -14,4 +14,4 @@ There is no actual data in this repository. The code creates and analyses datase
    - Create TF-IDF metric for each candidate's hashtags: _calculating_hashtag_tfidf.R_
    - Merge Twitter metrics and demographic/political data on candidates: _merging_metrics_and_candidate_variables.R_
 - **Analysis:**
-   - TBD
+   - Conduct basic exploratory analysis: _exploratory_analysis.R_
