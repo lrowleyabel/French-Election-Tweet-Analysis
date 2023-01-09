@@ -15,9 +15,3 @@ None of the main Twitter data is in this repository. The code creates and analys
    - Merge Twitter metrics and demographic/political data on candidates: _merging_metrics_and_candidate_variables.R_
 - **Analysis:**
    - Conduct basic exploratory analysis: _exploratory_analysis.R_
-
-
-**Example of analysis output:**
-
-
-![Example Plot](https://raw.githubusercontent.com/lrowleyabel/French-Election-Tweet-Analysis/main/Analysis/Exploratory%20Analysis/Plots/mean_tfidf_by_party_list.png)
