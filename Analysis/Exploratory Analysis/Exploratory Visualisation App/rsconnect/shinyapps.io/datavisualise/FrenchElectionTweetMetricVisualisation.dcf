@@ -1,0 +1,13 @@
+name: FrenchElectionTweetMetricVisualisation
+title: FrenchElectionTweetMetricVisualisation
+username:
+account: datavisualise
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8094554
+bundleId: 6760574
+url: https://datavisualise.shinyapps.io/FrenchElectionTweetMetricVisualisation/
+when: 1674388382.11858
+lastSyncTime: 1674388382.11858
+asMultiple: FALSE
+asStatic: FALSE

@@ -1,0 +1,29 @@
+Variable,Description
+bioid,Unique identifier for each candidate
+total_account,Total number of Twitter accounts belonging to candidate
+total_followers,Total number of followers candidate has
+total_following,Total number of accounts candidate follows
+renceny_created_within_[time period],How many accounts the candidate created during a time period relative to the campaign start
+total_tweets,Total number of tweets
+total_original_tweets,Total number of original tweets
+total_tweets_retweeted_by_candidate,Total number of times the candidate has retweeted another account
+total_campaign_tweets,Total number of tweets during the official campaigning period
+total_pre_campaign_tweets,Total number of tweets during the three months prior to the official campaigning period
+total_likes,Total number of likes across all tweets
+total_times_retweeted_by_others,Total number of times other accounts have reweeted the candidate's tweets
+prop_original,Proportion of candidate's tweets that are original
+prop_retweets,Proportion of candidate's tweets that are retweets
+mean_likes,Mean number of likes the candidate receives per tweet
+mean_retweeted_by_others,Mean number of times the candidate is retweeted per tweet
+dynamism,"Index indicating general level of Twitter acitivity. 0 = very unactive, 1 = very active"
+mean_tfidf,Distinctiveness of the candidate's hashtags compared to those used in the corpus of tweets as a whole. Higher values mean more distinctive.
+mean_party_tfidf,Distinctiveness of the candidate's hashtags compared to those used by other candidates in their party. Higher values mean more distinctive.
+party_name_original,Name of candidate's specific party
+listname_original,"Name of candidate's party list, if the specific party joined an electoral list, or specific party otherwise"
+independent,"Binary indicator of whether candidate is an independent candidate (0 = no, 1 = yes)"
+gender,Gender as declared by candidate
+office1_round_percent,Vote share achieved at first round
+office2_round_percent,Vote share achieved at second round
+party_list,Collapsed party/list variable which groups all minor parties as 'Other party'
+ensemble,Binary indicator of whether candidate is from the Ensemble list or not
+age,Age on date of the first election round

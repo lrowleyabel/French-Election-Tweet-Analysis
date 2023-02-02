@@ -78,11 +78,18 @@ party_colours<- list("Other party" = degas[5],
 party_fill_scale<- scale_fill_manual(name = "Party List", values = party_colours)
 party_colour_scale<- scale_color_manual(name = "Party List", values = party_colours)
 
+# Set colour palette for Ensemble vs Non-Ensemble
+binary_ensemble_colours<- list("Ensemble" = hiro[3],
+                              "Non-Ensemble" = degas[5])
+
+binary_ensemble_fill_scale<- scale_fill_manual(name = "Ensemble vs Non-Ensemble", values = binary_ensemble_colours)
+binary_ensemble_colour_scale<- scale_color_manual(name = "Ensemble vs Non-Enseble", values = binary_ensemble_colours)
+
 # Set standard plot width, height and margins
 width_horizontal<- 4*1280
 height_horizontal<- 4*720
 margins_horizontal<- margin(t = 25, r = 20, b = 10, l = 5, unit = "pt")
-ggtheme$theme$line$colour
+
 # Plot frequency of each summarised party
 p<- df%>%
   group_by(party_list)%>%
@@ -131,3 +138,16 @@ ggsave(p, filename = "Plots\\mean_tfidf_by_party_list.png", width = width_horizo
 
 # Test difference in mean TFIDF for Ensemble and non-Ensemble candidates
 t.test(mean_tfidf ~ ensemble, data = df)
+
+df%>%
+ggplot()+
+  geom_boxplot(aes(x = mean_party_tfidf, y = party_list), fill = degas[5])+
+  scale_x_log10()+
+  labs(title = "Distribution of Hashtag Distinctiveness by Party List", subtitle = "Data from Digital Society Project and University of Nottingham", x = "Mean hashtag TF-IDF (log scale)", y = "")+
+  theme(legend.position = "none",
+        plot.title.position = "panel",
+        plot.title = element_text(hjust = 0),
+        plot.margin = margins_horizontal)
+
+
+
