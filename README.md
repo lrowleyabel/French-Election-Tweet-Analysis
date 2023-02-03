@@ -13,5 +13,9 @@ None of the main Twitter data is in this repository. The code creates and analys
    - Extract hashtags used in Tweets: _extracting_hashtags.R_
    - Create TF-IDF metric for each candidate's hashtags: _calculating_hashtag_tfidf.R_
    - Merge Twitter metrics and demographic/political data on candidates: _merging_metrics_and_candidate_variables.R_
-- **Analysis:**
-   - Conduct basic exploratory analysis: _exploratory_analysis.R_
+- **Exploratory Analysis:**
+   - Conduct basic exploratory analysis of main variables: _exploratory_analysis.R_
+   - Analyse account creation dates: _account_recency_analysis.R_
+
+
+![example plot](https://raw.githubusercontent.com/lrowleyabel/French-Election-Tweet-Analysis/main/Analysis/Exploratory%20Analysis/Plots/account_creation_date_distribution_by_party.png)
