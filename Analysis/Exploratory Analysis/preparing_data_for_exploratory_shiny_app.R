@@ -37,7 +37,7 @@ df<- df%>%
 df<- df%>%
   mutate(party_list = case_when(listname_original == "Ensemble" ~ "Ensemble",
                                 listname_original == "Rassemblement National" ~ "Rassemblement National",
-                                listname_original == unique(df$listname_original)[4] ~ "NUPES",
+                                listname_original == "La Nouvelle Union populaire écologique et sociale" ~ "NUPES",
                                 listname_original == "Les Républicains" ~ "Les Républicains",
                                 listname_original == "Reconquête" ~ "Reconquête",
                                 independent == 1 ~ "Independent",
