@@ -6,7 +6,7 @@
 
 
 # LAURENCE ROWLEY-ABEL, UNIVERSITY OF EDINBURGH
-# UPDATED: 03/02/23
+# UPDATED: 10/02/23
 
 # DESCRIPTION: This file plots the distribution of the Twitter account creation dates by party
 
@@ -113,7 +113,6 @@ df<- df%>%
   mutate(party_list = factor(party_list, levels = c("Ensemble", "NUPES", "Rassemblement National", "Les Républicains", "Reconquête", "Independent", "Other party")))
 
 # Plot distribution of account creation dates by party
-
 p<- ggplot(df)+
       geom_density_ridges2(aes(x = date, y = party_list, fill = party_list, height = ..count..), stat = "density", trim = T, adjust = 0.1, scale = 3, size = 0.2, alpha = 0.9)+
       annotate(geom = "text", x = dmy("01-01-2007"), y = 9, label = "Note: height represents number of accounts created on that date", size = 2.5, hjust = 0)+
@@ -133,13 +132,11 @@ p
 
 ggsave(p, filename = "Plots\\account_creation_date_distribution_by_party.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
 
-# Plot distribution of account creation dates by party
-
+# Plot distribution of account creation dates by party for just the 12 months preceding the election
 p<-df%>%
   filter(date>=dmy("12/06/21"))%>%
   ggplot()+
   geom_density_ridges2(aes(x = date, y = party_list, fill = party_list, height = ..count..), stat = "density", trim = T, adjust = 0.1, scale = 3, size = 0.2, alpha = 0.9)+
-  #annotate(geom = "text", x = dmy("01-01-2007"), y = 9, label = "Note: height represents number of accounts created on that date", size = 2.5, hjust = 0)+
   party_fill_scale+
   scale_x_date(date_breaks = "1 month", date_labels = "%b %Y")+
   scale_y_discrete(expand = expand_scale(c(0.1,0.55)))+

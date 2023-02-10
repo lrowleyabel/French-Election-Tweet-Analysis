@@ -1,14 +1,14 @@
-#####################################
-#                                   #
-#  EXPLORATORY TWEET TEXT ANALYSIS  #
-#                                   #
-#####################################
+#########################
+#                       #
+#  TWEET DATE ANALYSIS  #
+#                       #
+#########################
 
 
 # LAURENCE ROWLEY-ABEL, UNIVERSITY OF EDINBURGH
-# UPDATED: 03/02/23
+# UPDATED: 10/02/23
 
-# DESCRIPTION: This file conducts some basic text analysis of the Tweet text
+# DESCRIPTION: This file plots the distribution of Tweets over time
 
 library(dplyr)
 library(stringr)
@@ -105,7 +105,7 @@ width_horizontal<- 4*1280
 height_horizontal<- 4*720
 margins_horizontal<- margin(t = 25, r = 20, b = 10, l = 5, unit = "pt")
 
-# Plot distribution of account creation dates overall
+# Plot distribution of Tweet dates overall
 p<- ggplot(tweet_df)+
   geom_density(aes(x = date), color = "white", fill = met.brewer("Degas")[5], adjust = 0.25)+
   scale_x_date(date_breaks = "2 years", date_labels = "%Y")+
@@ -124,8 +124,7 @@ ggsave(p, filename = "Plots\\tweet_date_distribution.png", width = width_horizon
 tweet_df<- tweet_df%>%
   mutate(party_list = factor(party_list, levels = c("Ensemble", "NUPES", "Rassemblement National", "Les Républicains", "Reconquête", "Independent", "Other party")))
 
-# Plot distribution of account creation dates by party
-
+# Plot distribution of Tweet dates by party
 p<- ggplot(tweet_df)+
   geom_density_ridges2(aes(x = date, y = party_list, fill = party_list, height = ..count..), stat = "density", trim = T, adjust = 0.1, scale = 3, size = 0.2, alpha = 0.9)+
   annotate(geom = "text", x = dmy("01-01-2007"), y = 9, label = "Note: height represents number of accounts created on that date", size = 2.5, hjust = 0)+
@@ -146,8 +145,7 @@ p
 ggsave(p, filename = "Plots\\tweet_date_distribution_by_party.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
 
 
-# Plot distribution of account creation dates by party
-
+# Plot distribution of Tweet dates by party for just the 12 months preceding the election
 p<-tweet_df%>%
   filter(date>=dmy("12/06/2021"))%>%
   ggplot()+
