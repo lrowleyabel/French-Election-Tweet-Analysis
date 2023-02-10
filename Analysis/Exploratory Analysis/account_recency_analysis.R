@@ -109,11 +109,14 @@ p
 ggsave(p, filename = "Plots\\account_creation_date_distribution.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
 
 
+df<- df%>%
+  mutate(party_list = factor(party_list, levels = c("Ensemble", "NUPES", "Rassemblement National", "Les Républicains", "Reconquête", "Independent", "Other party")))
+
 # Plot distribution of account creation dates by party
 
 p<- ggplot(df)+
-      geom_density_ridges2(aes(x = date, y = party_list, fill = party_list, height = ..density..), stat = "density", trim = T, adjust = 0.1, scale = 3, size = 0.2)+
-        annotate(geom = "text", x = dmy("01-01-2007"), y = 9, label = "Note: height represents relative distribution of creation dates within each party,\nnot absolute number of accounts created on that date", size = 2.5, hjust = 0)+
+      geom_density_ridges2(aes(x = date, y = party_list, fill = party_list, height = ..count..), stat = "density", trim = T, adjust = 0.1, scale = 3, size = 0.2, alpha = 0.9)+
+      annotate(geom = "text", x = dmy("01-01-2007"), y = 9, label = "Note: height represents number of accounts created on that date", size = 2.5, hjust = 0)+
       party_fill_scale+
       scale_x_date(date_breaks = "2 years", date_labels = "%Y")+
       scale_y_discrete(expand = expand_scale(c(0.1,0.55)))+
@@ -129,4 +132,28 @@ p<- ggplot(df)+
 p
 
 ggsave(p, filename = "Plots\\account_creation_date_distribution_by_party.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
+
+# Plot distribution of account creation dates by party
+
+p<-df%>%
+  filter(date>=dmy("12/06/21"))%>%
+  ggplot()+
+  geom_density_ridges2(aes(x = date, y = party_list, fill = party_list, height = ..count..), stat = "density", trim = T, adjust = 0.1, scale = 3, size = 0.2, alpha = 0.9)+
+  #annotate(geom = "text", x = dmy("01-01-2007"), y = 9, label = "Note: height represents number of accounts created on that date", size = 2.5, hjust = 0)+
+  party_fill_scale+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y")+
+  scale_y_discrete(expand = expand_scale(c(0.1,0.55)))+
+  labs(title = "Distribution of Candidates' Twitter Account Creation Dates by Party in\nYear Preceding Election", subtitle = "Data from Digital Society Project and University of Nottingham", x = "Account creation date", y = "")+
+  theme(text = element_text(size = 9),
+        legend.position = "none",
+        axis.text = element_text(size = 7),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title.position = "panel",
+        plot.title = element_text(hjust = 0),
+        plot.subtitle = element_text(hjust = 0),
+        plot.margin = margins_horizontal)
+
+p
+
+ggsave(p, filename = "Plots\\account_creation_date_distribution_by_party_12_months.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
 
