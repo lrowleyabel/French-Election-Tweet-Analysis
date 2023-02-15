@@ -33,11 +33,43 @@ data_dir<- choose.dir(caption = "Select data directory on University of Nottingh
 # Load account dataset
 load(paste0(data_dir, "\\Account Data\\Rda Formatted Data\\Account Data.Rda"))
 
+# Load Tweet data
+load(paste0(data_dir, "\\Tweet Data\\Rda Formatted Data\\Tweet Data.Rda"))
+
+# Parse tweet creation date as a date
+tweet_df<- tweet_df%>%
+  mutate(date = parse_date_time(created_at, "a b d H:M:S z Y")%>%
+           lubridate::date())
+
+# Get date of latest tweet for each account in the tweet dataset
+latest_tweets<- tweet_df%>%
+  group_by(user_id_str)%>%
+  slice_max(order_by = date, n = 1, with_ties = F)%>%
+  rename(latest_tweet_date = date)%>%
+  select(user_id_str, latest_tweet_date)
+
+# Join latest tweet dates to account data
+accounts_df<- left_join(accounts_df, latest_tweets, by = c("id_str" = "user_id_str"))
+
+# Filter account data to keep only accounts active in the 9 months prior to the election
+accounts_df<- accounts_df%>%
+  filter(latest_tweet_date >= dmy("12/09/2021"))
+
 # Read in BIOID to Twitter ID Lookup
 lookup<- read.csv("..\\Lookups\\BIOID_to_twitter_handle_lookup.csv", fileEncoding = "UTF-8")
 
-# Check there are no scraped accounts who are not in our lookpup (allowing for differences in capitalisation)
-table(str_to_lower(accounts_df$screen_name) %in% str_to_lower(lookup$Account_Handle))
+# Check for any scraped accounts which are not in our lookpup (allowing for differences in capitalisation)
+# These are accounts which were included in the original data collection but have subsequently been removed as they were not valid (generally because they represented an area, rather than an individual candidate)
+accounts_df%>%
+  filter(!str_to_lower(screen_name) %in% str_to_lower(lookup$Account_Handle))%>%
+  View()
+
+# Check for accounts linked to more than one BIOID in the lookup
+lookup%>%
+  group_by(Account_Handle)%>%
+  summarise(n = n())%>%
+  arrange(-n)%>%
+  filter(n>1)
 
 # Create lowercase handle variable in both the accounts dataset and the lookup
 accounts_df<- accounts_df%>%
@@ -54,19 +86,12 @@ accounts_df<- accounts_df%>%
   mutate(date = parse_date_time(created_at, "a b d H:M:S z Y")%>%
            lubridate::date())
 
-# Create variable indicating number of days before the campaign start (30-05-2022) that the account was created
-campaign_start<- dmy("30-05-2022")
-
+# Create variable indicating whether the account is a 'new' account, defined as being created within the 9 months prior to the election.
+# Accounts created after 14th May 2022 are given a missing value for this variable, since looking for new accounts for some parties stopped at this point due to the data collection process.
 accounts_df<- accounts_df%>%
-  mutate(account_age_days = as.double(campaign_start - date, units = "days"))
-
-# Create variables indicating whether the account was created within the t months prior to the start of the campaign for t = 0 to t = 12
-accounts_df<- accounts_df%>%
-  mutate(account_age_months = ceiling(account_age_days/30))%>%
-  mutate(recency = case_when(account_age_months > 12 ~ "created_over_a_year_ago",
-                                        account_age_months < 1 ~ "created_after_campaign_start",
-                                        is.numeric(account_age_months) ~ paste0("created_within_the_", account_age_months, "_months_prior_to_campgain")))%>%
-  dummy_cols("recency")
+  mutate(new_account = case_when(date > dmy("14/05/2022") ~ NA,
+                                 date >= dmy("12/09/2021") ~ T,
+                                 T ~ F))
 
 # Create dataframe summarising account metrics for each BIOID 
 account_metrics<- accounts_df%>%
@@ -74,18 +99,13 @@ account_metrics<- accounts_df%>%
   summarise(total_account = n(),
             total_followers = sum(followers_count),
             total_following = sum(friends_count),
-            across(starts_with("recency_"), .fns = ~sum(as.numeric(.x))))
+            created_new_accounts = ifelse(sum(new_account, na.rm = T)>0,1,0))
 
 # Save account metrics as CSV file
 write.csv(account_metrics, file = paste0(data_dir, "\\Account Data\\CSV Formatted Data\\Account Metrics.csv"), row.names = F, fileEncoding = "UTF-8")
 
 
 ### STEP 2: CREATE TWEET METRICS ###
-
-
-# Load Tweet data
-load(paste0(data_dir, "\\Tweet Data\\Rda Formatted Data\\Tweet Data.Rda"))
-
 
 
 # Check for duplicated tweets
@@ -109,10 +129,12 @@ tweet_df<- tweet_df%>%
 # Join BIOID to tweet data based on Twitter handle, allowing for differences in capitalisation
 tweet_df<- left_join(tweet_df, select(lookup, BIOID, Lower_Account_Handle), by = c("lower_user_screen_name" = "Lower_Account_Handle"))
 
-# Parse tweet creation date as a date
+# Filter for only tweets in the 9 months prior to the elections
 tweet_df<- tweet_df%>%
-  mutate(date = parse_date_time(created_at, "a b d H:M:S z Y")%>%
-           lubridate::date())
+  filter(date >= dmy("12/09/2021"))
+
+# Set campaign start date
+campaign_start<- dmy("30/05/2022")
 
 # Create dataframe summarising tweet metrics for each BIOID
 tweet_metrics<- tweet_df%>%
@@ -120,8 +142,6 @@ tweet_metrics<- tweet_df%>%
   summarise(total_tweets = n(),
             total_original_tweets = sum(!is_retweet),
             total_tweets_retweeted_by_candidate = sum(is_retweet),
-            total_campaign_tweets = sum(date >= campaign_start),
-            total_pre_campaign_tweets = sum(as.double(campaign_start - date, units = "days") <= 90),
             total_likes = sum(favorite_count),
             total_times_retweeted_by_others = sum(retweet_count))%>%
   mutate(prop_original = 100*(total_original_tweets/total_tweets),
@@ -136,12 +156,6 @@ write.csv(tweet_metrics, file = paste0(data_dir, "\\Tweet Data\\CSV Formatted Da
 
 ### STEP 3: CREATE METRICS ON OVERALL ACTIVITY ###
 
-
-# Check there are the same BIOIDs in the account metrics and tweet metrics datafranes 
-n_distinct(account_metrics$BIOID)
-n_distinct(tweet_metrics$BIOID)
-table(account_metrics$BIOID %in% tweet_metrics$BIOID)
-table(tweet_metrics$BIOID %in% account_metrics$BIOID)
 
 # Join account and tweet metrics by BIOID
 metrics_df<- left_join(account_metrics, tweet_metrics, by = "BIOID")
@@ -172,18 +186,6 @@ ggplot(metrics_df)+
   geom_histogram(aes(x = log(mean_times_retweeted_by_others)), color = "white")
 
 ggplot(metrics_df)+
-  geom_histogram(aes(x = total_campaign_tweets), color = "white")
-
-ggplot(metrics_df)+
-  geom_histogram(aes(x = log(total_campaign_tweets)), color = "white")
-
-ggplot(metrics_df)+
-  geom_histogram(aes(x = total_pre_campaign_tweets), color = "white")
-
-ggplot(metrics_df)+
-  geom_histogram(aes(x = log(total_pre_campaign_tweets)), color = "white")
-
-ggplot(metrics_df)+
   geom_histogram(aes(x = total_followers), color = "white")
 
 ggplot(metrics_df)+
@@ -195,15 +197,14 @@ ggplot(metrics_df)+
 ggplot(metrics_df)+
   geom_histogram(aes(x = log(total_following)), color = "white")
 
-
 # Transform heavily skewed variables by calculating log(x + 1)
 metrics_df<- metrics_df%>%
-  mutate(across(c(total_followers, total_following, total_tweets, total_campaign_tweets, total_pre_campaign_tweets, mean_likes, mean_times_retweeted_by_others), ~log(.x+1), .names = "log_{.col}"))
+  mutate(across(c(total_followers, total_following, total_tweets, mean_likes, mean_times_retweeted_by_others), ~log(.x+1), .names = "log_{.col}"))
 
 # Create composite 'dynamism' score to summarise overall Twitter activity
 # Select variables to include in composite score
 score_df<- metrics_df%>%
-  select(BIOID, log_total_campaign_tweets, log_total_pre_campaign_tweets, log_total_followers, log_total_following, log_mean_likes, log_mean_times_retweeted_by_others)
+  select(BIOID, log_total_tweets, log_total_following, log_mean_likes, log_mean_times_retweeted_by_others, created_new_accounts)
 
 # Conver BIOID to string variable so it doesn't get picked up as a numeric variable to include in the composite score
 score_df<- score_df%>%
@@ -228,15 +229,15 @@ score_df%>%
   mutate(across(c(Min, Max, Mean, SD), ~round(.x, 2)))
 
 
-# Look at Cronbach's alpha for score variables
+# Look at Cronbach's alpha for continuous score variables
 score_df%>%
-  select(-BIOID)%>%
+  select(-BIOID, -created_new_accounts)%>%
   psych::alpha()
 
 # Create composite score using row means
 score_df<-score_df%>%
   rowwise()%>%
-  mutate(dynamism = mean(log_total_campaign_tweets:log_mean_times_retweeted_by_others))
+  mutate(dynamism = mean(log_total_tweets:created_new_accounts))
 
 # Look at composite score distribution
 score_df%>%

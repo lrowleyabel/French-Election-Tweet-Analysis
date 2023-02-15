@@ -6,7 +6,7 @@
 
 
 # LAURENCE ROWLEY-ABEL, UNIVERSITY OF EDINBURGH
-# UPDATED: 07/01/23
+# UPDATED: 15/02/23
 
 # DESCRIPTION: This file takes the candidate dataset and creates a long-format lookup for BIOID to Twitter handle
 
@@ -21,8 +21,12 @@ rm(list = ls())
 # Get directory containing working candidate datasets on University of Nottingham OneDrive
 data_dir<- choose.dir(caption = "Select directory containing working candidate datasets on University of Nottingham OneDrive")
 
-# Read in all candidate data
-df<- read_excel(paste0(data_dir, "\\Combined Candidates 05-01-23.xlsx"), col_types = "text")
+# Read in all candidate data and combine into single dataframe
+df_main<- read_excel(paste0(data_dir, "\\Working dataset - mainstream candidates_complete.xlsx"), col_types = "text")
+df_marginal<- read_excel(paste0(data_dir, "\\Working dataset - marginal candidates_complete.xlsx"), col_types = "text")
+df_fringe<- read_excel(paste0(data_dir, "\\Working dataset - fringe candidates.xlsx"), col_types = "text")
+
+df<- rbind(df_main, df_marginal, df_fringe)
 
 # Create dataframe with variables with BIOID and Twitter handles
 handles_df<- df%>%
@@ -31,7 +35,14 @@ handles_df<- df%>%
 # Pivot handles dataframe to long format and filter out NAs
 lookup<- handles_df%>%
   pivot_longer(cols = matches("[A-Z]*TWIT[0-9]?[0-9]?$"), values_to = "Account_Handle", names_to = c("Account_Type"))%>%
-  filter(Account_Handle != "NA")
+  filter(!Account_Handle %in% c("NA", "na", NA))
+
+# Check that there are no duplicated handles
+lookup%>%
+  group_by(Account_Handle)%>%
+  summarise(n = n())%>%
+  arrange(-n)%>%
+  filter(n>1)
 
 # Create dataframe of OTWIT handles and types
 otwit_types<- df%>%
