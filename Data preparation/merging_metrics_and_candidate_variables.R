@@ -6,7 +6,7 @@
 
 
 # LAURENCE ROWLEY-ABEL, UNIVERSITY OF EDINBURGH
-# UPDATED: 08/01/23
+# UPDATED: 16/02/23
 
 # DESCRIPTION: This file takes the mterics of Twitter activity for each candidate and merges it with the
 # relevant demographic and political data collected on each candidate by the TplF team.
@@ -30,6 +30,10 @@ dataset_dir<- choose.dir("Select directory containing metrics data on University
 # Read in the Tweet Metrics data
 load(paste0(dataset_dir, "\\Overall Metrics\\Overall Twitter Metrics.Rda"))
 
+# Remove row of metrics data that contains metrics for Twitter accounts no longer linked to a BIOID
+metrics_df<- metrics_df%>%
+  filter(!is.na(BIOID))
+
 # Check all BIOIDs in the metrics data are in the candidate data
 table(metrics_df$BIOID %in% candidate_df$BIOID)
 
@@ -44,6 +48,6 @@ metrics_df<- metrics_df%>%
 # Merge metrics and candidate data
 df<- right_join(metrics_df, candidate_df, by = "BIOID")
 
-# Save final dataset as Rda and CSV file
+# Save dataset as Rda and CSV file
 save(df, file = paste0(dataset_dir, "\\Analysis Dataset\\Analysis Dataset.Rda"))
 write.csv(df, file = paste0(dataset_dir, "\\Analysis Dataset\\Analysis Dataset.csv"), row.names = F, fileEncoding = "UTF-8")
