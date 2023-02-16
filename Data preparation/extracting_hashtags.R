@@ -35,58 +35,45 @@ files<- list.files(dir, recursive = T)
 files<- paste0(dir, "/", files)
 
 # Define a function to extract the hashtags from each JSON file
-extract_hashtags<- function(row_range){
+extract_hashtags<- function(json_paths){
   
-  # Load the relevant packages (required since the function will be applied in separate instances of R)
-  library(jsonlite)
+  # Load libraries. This is necessary as the function will be being run in separate instances of R.
   library(dplyr)
-  library(lubridate)
-  library(stringr)
-  library(parallel)
-  library(tidyr)
-  
-  # Create a list of file indexes to loop over
-  range<- seq(file_range[1], file_range[2])
+  library(jsonlite)
+  library(jqr)
   
   # Loop over files
-  for (i in range){
+  for (path in json_paths){
     
-    # Read in JSON file
-    file<- files[i]
-    raw_string<- readLines(con = file)
+    # Read in JSON file as string
+    raw_string<- readLines(con = path)
+    
+    # Concatenate the JSON elements into a JSON array
     combined_string<- paste0("[", paste0(raw_string, collapse = ","), "]")
+    
+    # Parse JSON string using JQ interface to keep only relevant variables
+    combined_string<- combined_string%>%
+      jq('.[] | {id_str: .id_str, created_at: .created_at, htags: .entities.hashtags[].text, user_id_str: .user.id_str, user_screen_name: .user.screen_name}')
+    
+    # Re-concatenate the parsed JSON elements into a JSON array
+    combined_string<- paste0("[", paste0(combined_string, collapse = ","), "]")
+    
+    # Convert JSON array to R dataframe
     df<- fromJSON(combined_string)
     
-    # Get account ID and handle
-    user_id_str<- df$user$id_str[1]
-    user_screen_name<- df$user$screen_name[1]
-    
-    # Get hashtag entities, where available
-    if( !is.null(df$entities$hashtags)){
-      # Get the list of dataframes containing the hashtags for each Tweet
-      htags<- df$entities$hashtags
-      # Combine the list of dataframes into one dataframe
-      htags<- do.call("rbind", htags)
-      # Combine all the hashtags into one text string, separated by spaces
-      htags<- paste0(htags$text, collapse = " ")
-    } else {
-      # If no hashtags available, set htags to NA
-      htags<- NA
-    }
-    
-    # Create a dataframe containing the account ID and handle and the hashtag string
-    out_df<- data.frame(user_id_str = user_id_str, user_screen_name = user_screen_name, htags = htags)
-    
-    # Add the created dataframe to a dataframe to output from the function
     if(exists("hashtag_df")){
-      hashtag_df<- rbind(hashtag_df, out_df)
+      hashtag_df<- rbind(hashtag_df, df)
     } else {
-      hashtag_df<- out_df
+      hashtag_df<- df
     }
     
   }  
   return(hashtag_df)
 }
+
+
+
+htag_df<- extract_hashtags(json_paths = files)
 
 
 ### STEP 2: RUN FUNCTION IN PARALLEL ACROSS MULTIPLE CORES ###
@@ -96,16 +83,16 @@ extract_hashtags<- function(row_range){
 n_cores<- parallel::detectCores() - 1
 
 # Create a cluster of cores
-cl<- makeCluster(7)
+cl<- makeCluster(n_cores)
 
 # Create a list of file ranges for each core to use
-file_ranges<- list(c(1,499), c(500,999), c(1000, 1499), c(1500, 1999), c(2000,2499), c(2500,2999), c(3000,3785))
+#file_ranges<- list(c(1,499), c(500,999), c(1000, 1499), c(1500, 1999), c(2000,2499), c(2500,2999), c(3000,3785))
 
 # Export relevant R objects to the cluster
-clusterExport(cl = cl, varlist = c("extract_hashtags", "file_ranges", "files"))
+clusterExport(cl = cl, varlist = c("extract_hashtags", "files"))
 
 # Apply the extract_hashtags function across the files
-results<- parLapply(cl, rows, extract_hashtags)
+results<- parLapply(cl, files, extract_hashtags)
 
 # Stop the cluster of cores
 stopCluster(cl)
@@ -130,16 +117,27 @@ df<- df%>%
 lookup<- lookup%>%
   mutate(Lower_Account_Handle = str_to_lower(Account_Handle))
 
-# Check all handles in the hashtag data are present in the lookup, allowing for differences in capitalisation
-table(df$lower_user_screen_name %in% lookup$Lower_Account_Handle)
+# Check for handles in the hashtag data that are not present in the lookup.
+# These should be handles that were originally included in the data collection but which have seubsequently been excluded.
+df%>%
+  filter(!lower_user_screen_name %in% lookup$Lower_Account_Handle)%>%
+  group_by(lower_user_screen_name)%>%
+  slice_max(order_by = row_number(), n = 1)%>%
+  dplyr::select(user_screen_name)
 
 # Join the BIOID to the hashtag data
-df<- left_join(df, select(lookup, BIOID, Lower_Account_Handle), by = c("lower_user_screen_name" = "Lower_Account_Handle"))
+df<- left_join(df, dplyr::select(lookup, BIOID, Lower_Account_Handle), by = c("lower_user_screen_name" = "Lower_Account_Handle"))
+
+# Filter out hashtags not linked to a BIOID
+df<- df%>%
+  filter(!is.na(BIOID))
 
 # Select relevant variables and rename to more informative names
 df<- df%>%
-  select(BIOID, user_screen_name, user_id_str, htags)%>%
-  rename(hashtags = htags)
+  dplyr::select(BIOID, user_screen_name, user_id_str, id_str, htags, created_at)%>%
+  rename(tweet_id_str = id_str,
+         hashtags = htags,
+         tweet_date = created_at)
 
 # Rename dataframe to more informative name
 hashtag_df<- df
