@@ -14,6 +14,7 @@ None of the main Twitter data is in this repository. The code creates and analys
    - Create TF-IDF metric for each candidate's hashtags: _calculating_hashtag_tfidf.R_
    - Create composite score measuring originality of each candidate's Twitter behaviour: _calculating_originality_score.R_
    - Merge Twitter metrics and demographic/political data on candidates: _merging_metrics_and_candidate_variables.R_
+   - Add circonscription-level variables: _adding_circonscription_level_variables.R_
 - **Exploratory Analysis:**
    - Conduct basic exploratory analysis of main variables: _exploratory_analysis.R_
    - Analyse account creation dates: _account_recency_analysis.R_
