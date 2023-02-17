@@ -18,6 +18,7 @@ library(ggplot2)
 library(ggthemr)
 library(MetBrewer)
 library(utils)
+library(patchwork)
 
 setwd(choose.dir(caption = "Select working directory"))
 rm(list = ls())
@@ -150,7 +151,7 @@ summarise(across(c(scaled_dynamism, scaled_originality, scaled_log_total_followi
 
 
 # Plot overall dynamism by party list
-p<- df%>%
+p1<- df%>%
   ggplot()+
     geom_boxplot(aes(x = scaled_dynamism, y = party_list, fill = party_list))+
     labs(title = "Distribution of Overall Dynamism by Party", subtitle = "Data from Digital Society Project and University of Nottingham", x = "Overall dynamism score", y = "")+
@@ -160,14 +161,14 @@ p<- df%>%
           plot.title = element_text(hjust = 0),
           plot.margin = margins_horizontal)
 
-p
-ggsave(p, filename = "Plots\\dynamism_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
+p1
+ggsave(p1, filename = "Plots\\dynamism_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
 
 # Test difference in dynamism for Ensemble and non-Ensemble candidates
 t.test(scaled_dynamism ~ ensemble, data = df)
 
 # Plot tweet volume by party list
-p<- df%>%
+p2<- df%>%
   ggplot()+
   geom_boxplot(aes(x = scaled_log_total_tweets, y = party_list, fill = party_list))+
   labs(title = "Distribution of Tweet Volume by Party", subtitle = "Data from Digital Society Project and University of Nottingham", x = "Scaled log of tweet volume", y = "", caption = "Note: tweet volume is logged and rescaled to between 0 and 100")+
@@ -179,14 +180,14 @@ p<- df%>%
         plot.caption = element_text(hjust = 0.5, size = 7),
         plot.caption.position = "panel")
 
-p
-ggsave(p, filename = "Plots\\scaled_tweet_volume_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
+p2
+ggsave(p2, filename = "Plots\\scaled_tweet_volume_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
 
 # Test difference in tweet volume for Ensemble and non-Ensemble candidates
 t.test(scaled_log_total_tweets ~ ensemble, data = df)
 
 # Plot total following by party list
-p<- df%>%
+p3<- df%>%
   ggplot()+
   geom_boxplot(aes(x = scaled_log_total_following, y = party_list, fill = party_list))+
   labs(title = "Distribution of Following Numbers by Party", subtitle = "Data from Digital Society Project and University of Nottingham", x = "Scaled log of number of accounts candidate follows", y = "", caption = "Note: number following is logged and rescaled to between 0 and 100")+
@@ -198,8 +199,8 @@ p<- df%>%
         plot.caption = element_text(hjust = 0.5, size = 7),
         plot.caption.position = "panel")
 
-p
-ggsave(p, filename = "Plots\\scaled_following_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
+p3
+ggsave(p3, filename = "Plots\\scaled_following_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
 
 # Test difference in following numbers for Ensemble and non-Ensemble candidates
 t.test(scaled_log_total_following ~ ensemble, data = df)
@@ -209,7 +210,7 @@ t.test(scaled_log_total_following ~ ensemble, data = df)
 
 
 # Plot originality score by party list
-p<- df%>%
+p4<- df%>%
   ggplot()+
   geom_boxplot(aes(x = scaled_originality, y = party_list, fill = party_list))+
   party_fill_scale+
@@ -219,14 +220,14 @@ p<- df%>%
         plot.title = element_text(hjust = 0),
         plot.margin = margins_horizontal)
 
-p
-ggsave(p, filename = "Plots\\originality_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
+p4
+ggsave(p4, filename = "Plots\\originality_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
 
 # Test difference in mean TFIDF for Ensemble and non-Ensemble candidates
 t.test(scaled_originality ~ ensemble, data = df)
 
 # Plot hashtag distinctiveness by party list
-p<- df%>%
+p5<- df%>%
   ggplot()+
   geom_boxplot(aes(x = scaled_prop_original, y = party_list, fill = party_list))+
   party_fill_scale+
@@ -236,14 +237,14 @@ p<- df%>%
         plot.title = element_text(hjust = 0),
         plot.margin = margins_horizontal)
 
-p
-ggsave(p, filename = "Plots\\original_proportion_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
+p5
+ggsave(p5, filename = "Plots\\original_proportion_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
 
 # Test difference in mean TFIDF for Ensemble and non-Ensemble candidates
 t.test(scaled_prop_original ~ ensemble, data = df)
 
 # Plot hashtag distinctiveness by party list
-p<- df%>%
+p6<- df%>%
   ggplot()+
   geom_boxplot(aes(x = scaled_log_mean_party_tfidf, y = party_list, fill = party_list))+
   party_fill_scale+
@@ -251,11 +252,12 @@ p<- df%>%
   theme(legend.position = "none",
         plot.title.position = "panel",
         plot.title = element_text(hjust = 0),
-        plot.margin = margins_horizontal)
+        plot.margin = margins_horizontal,
+        plot.caption = element_text(hjust = 0.5, size = 7),
+        plot.caption.position = "panel")
 
-p
-ggsave(p, filename = "Plots\\sclaed_mean_party_tfidf_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
+p6
+ggsave(p6, filename = "Plots\\sclaed_mean_party_tfidf_by_party_list.png", width = width_horizontal, height = height_horizontal, units = "px", dpi = 700)
 
 # Test difference in mean TFIDF for Ensemble and non-Ensemble candidates
 t.test(scaled_log_mean_party_tfidf ~ ensemble, data = df)
-
