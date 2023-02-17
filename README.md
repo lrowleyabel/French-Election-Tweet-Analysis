@@ -16,8 +16,11 @@ None of the main Twitter data is in this repository. The code creates and analys
    - Merge Twitter metrics and demographic/political data on candidates: _merging_metrics_and_candidate_variables.R_
    - Add circonscription-level variables: _adding_circonscription_level_variables.R_
 - **Exploratory Analysis:**
-   - Conduct basic exploratory analysis of main variables: _exploratory_analysis.R_
+   - Analyse tweet volumes over time: _tweet_date_analysis.R_
    - Analyse account creation dates: _account_recency_analysis.R_
+   - Explore data with Shiny app: _Exploratory Visualisation App/app.R_
+- **Bivariate Analysis:**
+   - Conduct bivariate analysis of looking at distribution of the dependent variables across parties: _bivariate_analysis.R_
 
 
 ![example plot](https://raw.githubusercontent.com/lrowleyabel/French-Election-Tweet-Analysis/main/Analysis/Exploratory%20Analysis/Plots/account_creation_date_distribution_by_party.png)
