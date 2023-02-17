@@ -204,7 +204,7 @@ metrics_df<- metrics_df%>%
 # Create composite 'dynamism' score to summarise overall Twitter activity
 # Select variables to include in composite score
 score_df<- metrics_df%>%
-  select(BIOID, log_total_tweets, log_total_following, log_mean_likes, log_mean_times_retweeted_by_others, created_new_accounts)
+  select(BIOID, log_total_tweets, log_total_following, created_new_accounts)
 
 # Conver BIOID to string variable so it doesn't get picked up as a numeric variable to include in the composite score
 score_df<- score_df%>%
@@ -237,7 +237,7 @@ score_df%>%
 # Create composite score using row means
 score_df<-score_df%>%
   rowwise()%>%
-  mutate(dynamism = mean(log_total_tweets:created_new_accounts))
+  mutate(dynamism = mean(c(log_total_tweets, log_total_following, created_new_accounts)))
 
 # Look at composite score distribution
 score_df%>%

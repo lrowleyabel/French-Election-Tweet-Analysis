@@ -23,7 +23,7 @@ rm(list = ls())
 # Get directory containing processed datasets on University of Nottingham OneDrive, under Twitter Scrapes > Datasets
 data_dir<-choose.dir(caption = "Sekect directory containing processed datasets on University of Nottingham OneDrive, under Twitter Scrapes > Datasets")
 
-# Read in analysis dataset
+# Read in analysis datasetg
 df<- read.csv(paste0(data_dir, "\\Analysis Dataset\\Analysis Dataset.csv"), fileEncoding = "UTF-8")
 
 # Standardise the capitalisation of variable names
@@ -31,7 +31,7 @@ colnames(df)<- str_to_lower(colnames(df))
 
 # Select relevant variables
 df<- df%>%
-  select(bioid:mean_party_tfidf, party_name_original, listname_original, independent, gender, birthdate, office1_round_percent, office2_round_percent)
+  select(bioid:originality, party_name_original, listname_original, independent, gender, birthdate, office1_round_percent, office2_round_percent, presidential_winner_lead, macron_percent:distance_from_paris)
 
 # Recode the listname to group minor parties as an "Other party" category and independents as their own category
 df<- df%>%
@@ -62,11 +62,6 @@ df<- df%>%
 # Replace erroneous values for age and offce1_round_percent
 df$age[df$age>100]<- NA
 df$office1_round_percent[df$office1_round_percent>100]<- NA
-
-# Create logged mean_tfidf and mean_party_tfidf variables
-df<- df%>%
-  mutate(log_mean_tfidf = log(mean_tfidf),
-         log_mean_party_tfidf = log(mean_party_tfidf))
 
 # Save data for shiny app
 save(df, file = ".//Exploratory Visualisation App//app_data_ignore.Rda")
