@@ -2,7 +2,7 @@
 
 This is code for a research project looking at the Twitter data of candidates in the 2022 French legislative elections. The research is being carried out with the University of Nottingham and [the Digital Society Project](http://digitalsocietyproject.org/).
 
-None of the main Twitter data is in this repository. The code creates and analyses datasets, but they are stored on the University of Nottingham OneDrive.
+None of the main Twitter data is in this repository. The code creates and analyses datasets, but accesses them remotely.
 
 **Workflow:**
 - **Data preparation:**
@@ -20,7 +20,10 @@ None of the main Twitter data is in this repository. The code creates and analys
    - Analyse account creation dates: _account_recency_analysis.R_
    - Explore data with Shiny app: _Exploratory Visualisation App/app.R_
 - **Bivariate Analysis:**
-   - Conduct bivariate analysis of looking at distribution of the dependent variables across parties: _bivariate_analysis.R_
+   - Conduct bivariate analysis looking at distribution of the dependent variables across parties: _bivariate_analysis.R_
+- **Multivariate Analysis:**
+   - Run multilevel regression models for each of the dependent variables: _multilevel_regression_models.R_
+- ...
 
 
 ![example plot](https://raw.githubusercontent.com/lrowleyabel/French-Election-Tweet-Analysis/main/Analysis/Exploratory%20Analysis/Plots/account_creation_date_distribution_by_party.png)

@@ -3,3 +3,5 @@ parLapply_results*.Rda
 *ignore.Rda
 *ignore.csv
 *ignore.R
+.docx
+.doc
